@@ -1,24 +1,32 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pcap.h>
+#include <Winsock2.h>
 
 void debug_print_packet_data(const u_char *pkt_data)
 {
+  const u_char *datagramme;
   int i, j;
   int packet_size;
   char c;
   
-  // Get the packet size from the UDP header
-  // TOTO: This is not the right method !
-  packet_size = (u_short)*(pkt_data + 39);
+  // Header ethernet => 14 Bytes
+  // Header IPV4 => 20 bytes
+  // Header UDP => 8 bytes
+  datagramme = pkt_data + 14 + 20 + 8;
+    
+  // Get the datagramme size from the UDP header
+  packet_size = ntohs(*(u_short *)(datagramme - 4)) - 8;
   printf("Packet. Size: %d\n", packet_size);
+  
+  datagramme = pkt_data + 14 + 20 + 8;
   
   for (i = 0; i < packet_size; i += 16) {
     // Hexadecimal data
     for (j = 0; j < 16; j++)
     {
       if (i + j < packet_size)
-        printf("%.2X ", *(pkt_data + 43 + i + j));
+        printf("%.2X ", *(datagramme + i + j));
       else
         printf("   ");
     }
@@ -28,7 +36,7 @@ void debug_print_packet_data(const u_char *pkt_data)
     // Printable characters
     for (j = 0; j < 16 && i + j < packet_size; j++)
     {
-      c = *(pkt_data + 43 + i + j);
+      c = *(datagramme + i + j);
       if (c < 32 || c > 126)
         c = '.';
       printf("%c", c);
