@@ -3,32 +3,68 @@
 #include <pcap.h>
 #include <Winsock2.h>
 
+void bin_prnt_byte(int x)
+{
+   int n;
+   for(n=0; n < 8; n++)
+   {
+      if((x & 0x80) !=0)
+      {
+         printf("1");
+      }
+      else
+      {
+         printf("0");
+      }
+      x = x<<1;
+   }
+}
 void debug_print_packet_data(const u_char *pkt_data)
 {
   const u_char *datagramme;
   int i, j;
   int packet_size;
-  char c;
+  unsigned char c;
   
   // Header ethernet => 14 Bytes
   // Header IPV4 => 20 bytes
   // Header UDP => 8 bytes
   datagramme = pkt_data + 14 + 20 + 8;
+  
+  
+  // Client or sever ?
+  char direction;
+  int src_port = ntohs(*(u_short *)(datagramme - 8));
+  int dest_port = ntohs(*(u_short *)(datagramme - 6));
+  if (src_port == 11677)
+    direction = '<';
+  else if (dest_port == 11677)
+    direction = '>';
+  else
+    direction = '?';
     
   // Get the datagramme size from the UDP header
   packet_size = ntohs(*(u_short *)(datagramme - 4)) - 8;
+  if (packet_size <= 4)
+    return;
   printf("Packet. Size: %d\n", packet_size);
   
   datagramme = pkt_data + 14 + 20 + 8;
   
   for (i = 0; i < packet_size; i += 16) {
     // Hexadecimal data
+    printf("%c ", direction);
     for (j = 0; j < 16; j++)
     {
       if (i + j < packet_size)
-        printf("%.2X ", *(datagramme + i + j));
+      {
+        c = *(datagramme + i + j);
+        printf("%.2X ", c);
+      }
       else
+      {
         printf("   ");
+      }
     }
 
     printf(" ");
@@ -38,13 +74,21 @@ void debug_print_packet_data(const u_char *pkt_data)
     {
       c = *(datagramme + i + j);
       if (c < 32 || c > 126)
+      {
         c = '.';
+      }
       printf("%c", c);
     }
-    
     printf("\n");
   }
-  printf("\n");
+  // Print the 3 first bytes in binary format
+  for (i = 0; i < 3; i++)
+  {
+    c = *(datagramme + i);
+    bin_prnt_byte(c);
+    printf(" ");
+  }
+  printf("\n\n");
 }
 
 int main()
