@@ -1,0 +1,17 @@
+OBJECT = interceptor
+CFLAGS = -W -Wall -g
+OBJS = main.o parse.o
+
+all: ${OBJS}
+	${CC} ${CFLAGS} -o ${OBJECT} ${OBJS}
+
+clean:
+	rm -f ${OBJS} ${OBJECT}
+
+fclean: clean
+
+re: clean all 
+
+.c.o:
+	${CC} ${CFLAGS} -c -o $*.o $<
+
