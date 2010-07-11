@@ -1,6 +1,6 @@
 OBJECT = interceptor
 CFLAGS = -W -Wall -g
-OBJS = main.o parse.o
+OBJS = main.o ip.o crafting.o data_header.o udp.o debug.o
 
 all: ${OBJS}
 	${CC} ${CFLAGS} -o ${OBJECT} ${OBJS}

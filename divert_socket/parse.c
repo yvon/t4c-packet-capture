@@ -133,6 +133,3 @@ void parse_server_packet(unsigned char *data, int len)
   if (packet_id == PAK_SERVER_PutPlayerInGame)
     received_pack_server_put_player_in_game(data, len);
 }
-
-
-
