@@ -1,6 +1,8 @@
 OBJECT = interceptor
 CFLAGS = -W -Wall -g
-OBJS = main.o ip.o crafting.o data_header.o udp.o debug.o
+SRCS = $(wildcard src/*.c)
+OBJS = $(SRCS:.c=.o)
+INCLUDES = includes
 
 all: ${OBJS}
 	${CC} ${CFLAGS} -o ${OBJECT} ${OBJS}
@@ -13,5 +15,5 @@ fclean: clean
 re: clean all 
 
 .c.o:
-	${CC} ${CFLAGS} -c -o $*.o $<
+	${CC} ${CFLAGS} -I ${INCLUDES} -c -o $*.o $<
 
