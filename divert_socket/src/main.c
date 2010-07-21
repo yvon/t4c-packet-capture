@@ -13,6 +13,7 @@
 #include "ip.h"
 #include "udp.h"
 #include "debug.h"
+#include "parse.h"
 
 #define IPPROTO_DIVERT 254
 #define BUFSIZE 65535
@@ -84,23 +85,25 @@ int main(int argc, char** argv) {
             
       if (sin.sin_addr.s_addr == 0)  // Outgoing packet
       {
-        write(0, ">", 1);
+        // write(0, ">", 1);
         #ifdef DEBUG
         printf("____ OUTGOING ____\n");
         debug_show_ip_header(packet);
         printf("------------------\n");
         #endif
-        craft_outgoing_packet(data, data_len);
+        if (parse_outgoing_packet(data, data_len) == 1)
+          craft_outgoing_packet(data, data_len);
       }
       else                            // Incoming packet
       {
-        write(0, "<", 1);
+        // write(0, "<", 1);
         #ifdef DEBUG
         printf("____ INCOMING ____\n");
         debug_show_ip_header(packet);
         printf("------------------\n");
         #endif
-        craft_incoming_packet(data, data_len);
+        if (parse_incoming_packet(data, data_len) == 1)
+          craft_incoming_packet(data, data_len);
       }
     }
     else
